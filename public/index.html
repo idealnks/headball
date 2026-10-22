@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="de">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Headball — Groß im Kopf. Stark am Ball.</title><link rel="stylesheet" href="/style.css"></head>
+<body>
+<header><a class="brand" href="/">◉ HEADBALL<span>ARCADE FOOTBALL</span></a><span class="badge"><i></i> LOKALES MATCH</span></header>
+<main>
+<section class="intro"><div><p class="eyebrow">KLEINES FELD. GROSSE KÖPFE.</p><h1>Alles eine <em>Kopfsache.</em></h1><p>Du, dein Kopf und ein ziemlich sprunghafter Ball.<br>Schlag die KI und hol dir den Sieg.</p></div><div class="edition">01 / SPIELMODUS<br><strong>Du gegen KI</strong><span>Ein Feld. Zwei Köpfe. Keine Ausreden.</span></div></section>
+<section class="arena" aria-label="Headball Spielfeld">
+<div class="matchbar"><div class="team"><span class="dot blue"></span> DU <small>HEIM</small></div><div class="score"><b id="score">0 : 0</b><span id="clock">01:30</span></div><div class="team away"><small>GAST</small> KI <span class="dot orange"></span></div></div>
+<canvas id="game" width="1100" height="520" aria-label="Fußballspiel: Pfeiltasten links und rechts zum Laufen, oben zum Springen" tabindex="0"></canvas>
+<div id="overlay" class="overlay"><span class="eyebrow">BEREIT FÜR DEN ANPFIFF?</span><h2>Zeig Köpfchen.</h2><p>90 Sekunden. Mehr Tore. Dein Match.</p><button id="start">Match starten <span>↗</span></button></div>
+<div class="fieldfooter"><span><i></i> <span id="status">BEREIT ZUM ANPFIFF</span></span><button id="pause">Ⅱ Pause</button><button id="restart">↻ Neustart</button></div>
+</section>
+<section class="instructions"><div class="instruction"><span class="number">01</span><div><h3>Bring dich in Position</h3><p><kbd>←</kbd> <kbd>→</kbd> Nach links und rechts laufen</p></div></div><div class="instruction"><span class="number">02</span><div><h3>Hoch hinaus</h3><p><kbd>↑</kbd> Springen und den Ball köpfen</p></div></div><div class="tip"><span>DER TRICK</span><p>Triff den Ball im Sprung seitlich am Kopf.<br>Timing schlägt wildes Herumhüpfen.</p></div></section>
+<div class="touch" aria-label="Touch-Steuerung"><button data-key="ArrowLeft" aria-label="Links">←</button><button data-key="ArrowRight" aria-label="Rechts">→</button><button data-key="ArrowUp" aria-label="Springen">↑</button></div>
+<footer><span>GROSSE KÖPFE. ECHTE DUELLE.</span><span>Mit Kopf gespielt. Im Browser gebaut.</span></footer>
+</main><script type="module" src="/game.js"></script></body></html>
