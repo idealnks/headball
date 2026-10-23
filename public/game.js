@@ -27,7 +27,7 @@ function powerState(side,kind){
  const active=!!special&&special.side===side&&(kind==='train'?special.type==='train':special.type!=='train');
  const ready=kind==='train'?trainReady[side]:specialReady[side];
  const used=kind==='eagle'&&specialGranted[side]&&!ready;
- const amount=ready?100:used?0:kind==='train'?Math.min(100,noGoalTime[side]/60*100):Math.min(100,Math.max(0,scores[1-side]-scores[side])/3*100);
+ const amount=active||ready?100:used?0:kind==='train'?Math.min(100,noGoalTime[side]/60*100):Math.min(100,Math.max(0,scores[1-side]-scores[side])/3*100);
  const key=side===0?(kind==='train'?'Z':'E'):mode==='local'?(kind==='train'?'H':'G'):'KI';
  return {amount,label:active?'AKTIV':ready?`BEREIT · ${key}`:used?'VERBRAUCHT':kind==='train'?`${Math.min(60,Math.floor(noGoalTime[side]))}/60 s`:`${Math.min(3,Math.max(0,scores[1-side]-scores[side]))}/3 Tore`,ready};
 }
