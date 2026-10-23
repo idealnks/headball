@@ -10,7 +10,7 @@ Node.js 24 verwenden. Keine externen Laufzeit-Abhängigkeiten erforderlich.
 npm run dev
 ```
 
-Der HTTP-Server lauscht auf Port 3000 (über `PORT` anpassbar). Pfeiltasten links/rechts bewegen die blaue Figur, oben springt. Leertaste pausiert. Auf Touch-Geräten stehen Richtungstasten bereit.
+Der HTTP-Server lauscht auf Port 3000 (über `PORT` anpassbar). Pfeiltasten links/rechts bewegen die blaue Figur, oben springt. Die Leertaste kickt einen nahen Ball in Blickrichtung nach vorne und oben. Pause über den Pause-Button. Bei einem eingeklemmten Ball zwischen beiden Figuren löst ein Pressschlag den Ball nach oben. Auf Touch-Geräten stehen Richtungstasten bereit.
 
 ## Aufbau
 

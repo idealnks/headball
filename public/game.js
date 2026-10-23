@@ -3,22 +3,50 @@ const W = 1100, H = 520, floor = 448, radius = 16;
 const keys = new Set();
 let state = 'ready', time = 90, scores = [0, 0], goalWait = 0, last = 0, accumulator = 0;
 let player, ai, ball;
+let kickQueued=false, kickCooldown=0, pressCooldown=0;
 const overlay = document.querySelector('#overlay'), start = document.querySelector('#start');
-function resetField(){player={x:300,y:floor-48,vx:0,vy:0,color:'#69c5ed',face:1};ai={x:800,y:floor-48,vx:0,vy:0,color:'#f1a36e',face:-1};ball={x:550,y:160,vx:(Math.random()-.5)*160,vy:0};}
+function resetField(){kickQueued=false;kickCooldown=0;pressCooldown=0;player={x:300,y:floor-48,vx:0,vy:0,color:'#69c5ed',face:1};ai={x:800,y:floor-48,vx:0,vy:0,color:'#f1a36e',face:-1};ball={x:550,y:160,vx:(Math.random()-.5)*160,vy:0};}
 function begin(){scores=[0,0];time=90;goalWait=0;resetField();state='playing';overlay.hidden=true;canvas.focus();updateUI();}
 function updateUI(){document.querySelector('#score').textContent=`${scores[0]} : ${scores[1]}`;document.querySelector('#clock').textContent=`${String(Math.floor(Math.ceil(time)/60)).padStart(2,'0')}:${String(Math.ceil(time)%60).padStart(2,'0')}`;document.querySelector('#status').textContent=state==='playing'?'MATCH LÄUFT':state==='paused'?'MATCH PAUSIERT':state==='ended'?'ABPFIFF':'BEREIT ZUM ANPFIFF';}
 function show(title,sub,label){overlay.hidden=false;overlay.querySelector('h2').textContent=title;overlay.querySelector('p').textContent=sub;start.innerHTML=label+' <span>↗</span>';}
-function pause(){if(state==='playing'){state='paused';show('Kurze Halbzeit.','Durchatmen. Dein Match wartet.','Weiterspielen');}else if(state==='paused'){state='playing';overlay.hidden=true;canvas.focus();}updateUI();}
+function pause(){kickQueued=false;if(state==='playing'){state='paused';show('Kurze Halbzeit.','Durchatmen. Dein Match wartet.','Weiterspielen');}else if(state==='paused'){state='playing';overlay.hidden=true;canvas.focus();}updateUI();}
 start.onclick=()=>state==='paused'?pause():begin();document.querySelector('#restart').onclick=begin;document.querySelector('#pause').onclick=pause;
-window.addEventListener('keydown',e=>{if(e.key.startsWith('Arrow')){e.preventDefault();keys.add(e.key);}if(e.code==='Space'){e.preventDefault();if(!e.repeat)pause();}});
-window.addEventListener('keyup',e=>keys.delete(e.key));window.addEventListener('blur',()=>{keys.clear();if(state==='playing')pause();});
-document.querySelectorAll('[data-key]').forEach(button=>{button.onpointerdown=e=>{e.preventDefault();button.setPointerCapture(e.pointerId);keys.add(button.dataset.key);};button.onpointerup=button.onpointercancel=()=>keys.delete(button.dataset.key);});
+window.addEventListener('keydown',e=>{if(e.key.startsWith('Arrow')){e.preventDefault();keys.add(e.key);}if(e.code==='Space'){e.preventDefault();if(!e.repeat&&state==='playing')kickQueued=true;}});
+window.addEventListener('keyup',e=>keys.delete(e.key));window.addEventListener('blur',()=>{keys.clear();kickQueued=false;if(state==='playing')pause();});
+document.querySelectorAll('[data-key]').forEach(button=>{button.onpointerdown=e=>{e.preventDefault();button.setPointerCapture(e.pointerId);if(button.dataset.key==='Space'){if(state==='playing')kickQueued=true;}else keys.add(button.dataset.key);};button.onpointerup=button.onpointercancel=()=>keys.delete(button.dataset.key);});
 function personStep(p,dir,jump,dt){p.vx=dir*290;p.x=Math.max(65,Math.min(W-65,p.x+p.vx*dt));if(jump&&p.y>=floor-48-.1)p.vy=-570;p.vy+=1300*dt;p.y+=p.vy*dt;if(p.y>floor-48){p.y=floor-48;p.vy=0;}if(dir)p.face=dir;}
+// A short, directional kick lifts low balls back into heading range.
+function kick(){
+  if(kickCooldown>0)return;
+  kickCooldown=.3;
+  const forward=(ball.x-player.x)*player.face;
+  if(forward>=-12&&forward<=85&&ball.y>=player.y-22&&ball.y<=player.y+55){
+    ball.vx=player.face*460+player.vx*.2;
+    ball.vy=-650;
+  }
+}
+function pressBall(){
+  if(pressCooldown>0)return;
+  const left=player.x<=ai.x?player:ai,right=left===player?ai:player;
+  const gap=right.x-left.x;
+  const touching=p=>Math.hypot(ball.x-p.x,ball.y-(p.y-35))<=55||
+    (Math.abs(ball.x-p.x)<=37&&ball.y>=p.y-12&&ball.y<=p.y+55);
+  if(gap<110&&ball.x>=left.x&&ball.x<=right.x&&touching(left)&&touching(right)){
+    ball.x=(left.x+right.x)/2;
+    // Clear both heads so sequential collision resolution cannot trap the ball again.
+    ball.y=Math.min(ball.y,left.y-35-55,right.y-35-55);
+    ball.vy=-740;ball.vx=(left.vx+right.vx)*.15;
+    pressCooldown=.35;
+  }
+}
 function tick(dt){if(state!=='playing')return;if(goalWait>0){goalWait-=dt;if(goalWait<=0)resetField();return;}time=Math.max(0,time-dt);if(time===0){state='ended';show(scores[0]===scores[1]?'Unentschieden.':scores[0]>scores[1]?'Dein Sieg!':'Die KI gewinnt.',`${scores[0]} : ${scores[1]} — Zeit für die Revanche?`,'Noch ein Match');updateUI();return;}
+kickCooldown=Math.max(0,kickCooldown-dt);pressCooldown=Math.max(0,pressCooldown-dt);
 personStep(player,(keys.has('ArrowRight')?1:0)-(keys.has('ArrowLeft')?1:0),keys.has('ArrowUp'),dt);
 const target=ball.x>520?ball.x+35:790;personStep(ai,Math.abs(target-ai.x)>23?Math.sign(target-ai.x):0,ball.x>520&&Math.abs(ball.x-ai.x)<105&&ball.y>230&&ball.y<370&&ball.vy>0,dt);
+if(kickQueued){kickQueued=false;kick();}
 ball.vy+=920*dt;ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;ball.vx*=Math.pow(.998,dt*120);
 if(ball.y<radius){ball.y=radius;ball.vy=Math.abs(ball.vy)*.9;}if(ball.y>floor-radius){ball.y=floor-radius;ball.vy=-Math.abs(ball.vy)*.87;if(Math.abs(ball.vy)<100)ball.vy=-170;}
+pressBall();
 for(const p of [player,ai]){const headY=p.y-35,dx=ball.x-p.x,dy=ball.y-headY,dist=Math.hypot(dx,dy),reach=radius+35;if(dist<reach){const nx=dist?dx/dist:p.face,ny=dist?dy/dist:-1;ball.x=p.x+nx*reach;ball.y=headY+ny*reach;const rel=(ball.vx-p.vx)*nx+(ball.vy-p.vy)*ny;if(rel<0){ball.vx-=1.85*rel*nx;ball.vy-=1.85*rel*ny;}ball.vx+=p.vx*.22;ball.vy-=p.vy<0?85:0;}
 // The torso also blocks the ball instead of letting it pass through a player.
 if(Math.abs(ball.x-p.x)<32&&ball.y>p.y-5&&ball.y<floor){ball.vx=(ball.x>=p.x?1:-1)*Math.max(180,Math.abs(ball.vx));ball.x=p.x+Math.sign(ball.vx)*33;}}
