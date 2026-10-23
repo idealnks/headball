@@ -1,6 +1,6 @@
 # Headball
 
-Ein Fußballspiel für den Browser: ein Mensch gegen eine KI, große Köpfe und ein springender Ball. Ein Match dauert 90 Sekunden.
+Ein Fußballspiel für den Browser: ein Mensch gegen eine KI, große Köpfe und ein springender Ball. Die Spieldauer ist vor dem Anpfiff in drei Stufen wählbar: 1, 2 oder 3 Minuten (Standard: 2 Minuten). Änderungen gelten ab dem nächsten Anpfiff oder Neustart.
 
 ## Entwicklung
 
@@ -24,4 +24,6 @@ Physik- und KI-Tests: `node --test`.
 
 ## Doppelkopfadler-Spezial
 
-Beim exakten Rückstand von 0:3 bekommt die zurückliegende Seite einmal pro Match einen Spezialschuss. Für den Menschen: Taste S oder Adler-Button. Die KI aktiviert automatisch nach der Torpause. Der Ball verwandelt sich in einen Doppelkopfadler, wirft den Gegner um und erzielt garantiert genau ein Tor. Die Spielzeit pausiert während der Sequenz. Neustart setzt die Fähigkeit zurück. Der KI-Kopf aus dem bereitgestellten Bild liegt in `public/ai-face.png`.
+Ab drei Toren Rückstand (z. B. 2:5) bekommt die zurückliegende Seite einmal pro Match einen Spezialschuss. Für den Menschen: Taste S oder Adler-Button. Die KI aktiviert automatisch nach der Torpause. Der Ball verwandelt sich in einen Doppelkopfadler, wirft den Gegner um und erzielt garantiert genau ein Tor. Die sechs Sekunden lange Inszenierung umfasst Aufladung, Spiralflug, Einschlag und Torflug. Die Spielzeit pausiert während der Sequenz. Neustart setzt die Fähigkeit zurück. Der KI-Kopf aus dem bereitgestellten Bild liegt in `public/ai-face.png`.
+
+Die größeren Tore lassen hohe Bälle über stehende Figuren hinweg passieren; Springen ermöglicht die Abwehr. Die KI berechnet die Schussbahn einschließlich Luftwiderstand und zielt auf den oberen freien Torbereich.

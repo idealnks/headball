@@ -5,14 +5,15 @@
 <header><a class="brand" href="/">◉ HEADBALL<span>ARCADE FOOTBALL</span></a><span class="badge"><i></i> LOKALES MATCH</span></header>
 <main>
 <section class="intro"><div><p class="eyebrow">KLEINES FELD. GROSSE KÖPFE.</p><h1>Alles eine <em>Kopfsache.</em></h1><p>Du, dein Kopf und ein ziemlich sprunghafter Ball.<br>Schlag die KI und hol dir den Sieg.</p></div><div class="edition">01 / SPIELMODUS<br><strong>Du gegen KI</strong><span>Ein Feld. Zwei Köpfe. Keine Ausreden.</span></div></section>
+<div class="match-settings"><label for="duration">SPIELDAUER</label><select id="duration"><option value="60">1 Minute</option><option value="120" selected>2 Minuten</option><option value="180">3 Minuten</option></select><span>Gilt ab dem nächsten Anpfiff / Neustart</span></div>
 <section class="arena" aria-label="Headball Spielfeld">
-<div class="matchbar"><div class="team"><span class="dot blue"></span> DU <small>HEIM</small></div><div class="score"><b id="score">0 : 0</b><span id="clock">01:30</span></div><div class="team away"><small>GAST</small> KI <span class="dot orange"></span></div></div>
+<div class="matchbar"><div class="team"><span class="dot blue"></span> DU <small>HEIM</small></div><div class="score"><b id="score">0 : 0</b><span id="clock">02:00</span></div><div class="team away"><small>GAST</small> KI <span class="dot orange"></span></div></div>
 <canvas id="game" width="1100" height="520" aria-label="Fußballspiel: Pfeiltasten links und rechts zum Laufen, oben zum Springen, Leertaste zum Kicken" tabindex="0"></canvas>
-<div id="overlay" class="overlay"><span class="eyebrow">BEREIT FÜR DEN ANPFIFF?</span><h2>Zeig Köpfchen.</h2><p>90 Sekunden. Mehr Tore. Dein Match.</p><button id="start">Match starten <span>↗</span></button></div>
-<div class="fieldfooter"><span><i></i> <span id="status">BEREIT ZUM ANPFIFF</span></span><button id="special" disabled>S · Adler (bei 0:3)</button><button id="pause">Ⅱ Pause</button><button id="restart">↻ Neustart</button></div>
+<div id="overlay" class="overlay"><span class="eyebrow">BEREIT FÜR DEN ANPFIFF?</span><h2>Zeig Köpfchen.</h2><p>Deine Spielzeit. Mehr Tore. Dein Match.</p><button id="start">Match starten <span>↗</span></button></div>
+<div class="fieldfooter"><span><i></i> <span id="status">BEREIT ZUM ANPFIFF</span></span><button id="special" disabled>S · Adler (−3 Tore)</button><button id="pause">Ⅱ Pause</button><button id="restart">↻ Neustart</button></div>
 </section>
 <section class="instructions"><div class="instruction"><span class="number">01</span><div><h3>Bring dich in Position</h3><p><kbd>←</kbd> <kbd>→</kbd> Nach links und rechts laufen</p></div></div><div class="instruction"><span class="number">02</span><div><h3>Hoch hinaus</h3><p><kbd>↑</kbd> Springen und den Ball köpfen</p></div></div><div class="instruction"><span class="number">03</span><div><h3>Ball wieder hoch!</h3><p><kbd>Space</kbd> Nach vorne und oben kicken</p></div></div></section>
-<p class="special-help"><kbd>S</kbd> Doppelkopfadler: einmal pro Match beim Rückstand von 0:3. Trifft garantiert nach einem Adlerangriff. Die KI nutzt ihn automatisch.</p>
+<p class="special-help"><kbd>S</kbd> Doppelkopfadler: einmal pro Match ab drei Toren Rückstand. Trifft garantiert nach einem Adlerangriff. Die KI nutzt ihn automatisch.</p>
 <div class="touch" aria-label="Touch-Steuerung"><button data-key="ArrowLeft" aria-label="Links">←</button><button data-key="ArrowRight" aria-label="Rechts">→</button><button data-key="Space" aria-label="Kicken">Kick</button><button data-key="ArrowUp" aria-label="Springen">↑</button></div>
 <footer><span>GROSSE KÖPFE. ECHTE DUELLE.</span><span>Mit Kopf gespielt. Im Browser gebaut.</span></footer>
 </main><script type="module" src="/game.js"></script></body></html>
