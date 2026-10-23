@@ -15,3 +15,9 @@ Der HTTP-Server lauscht auf Port 3000 (über `PORT` anpassbar). Pfeiltasten link
 ## Aufbau
 
 `public/game.js` enthält Canvas-Darstellung, KI und Physik mit festen Simulationsschritten. `server.mjs` liefert die statischen Dateien. Schriftarten von Google Fonts sind optional; lokale Ersatzschriften funktionieren ohne Netzwerkzugriff.
+
+## Spieler und Gegner
+
+Die blaue Figur verwendet den aus dem bereitgestellten Foto erzeugten Kopf in `public/player-face.png`. Der Kick zeigt eine Beinbewegung und bei Ballkontakt einen Trefferblitz. Die KI verfolgt den Ball über die Mittellinie und kickt tiefe Bälle in Richtung des linken Tors.
+
+Physik- und KI-Tests: `node --test`.
