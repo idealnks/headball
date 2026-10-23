@@ -43,3 +43,7 @@ Beide Köpfe sind um 15 % vergrößert und wippen leicht; beim Laufen stärker a
 Spieldauer (1/2/3 Minuten) und Spielmodus werden im Menü vor dem Anpfiff ausgewählt. „Neues Match“ öffnet dieses Menü erneut. Bei Pause bleiben die Einstellungen verborgen, damit das laufende Match unverändert fortgesetzt wird.
 
 Spieler 1: Pfeiltasten links/rechts, oben zum Springen, Space zum Kicken, E für Adler und Z für Zug. Im KI-Modus funktioniert weiterhin S für Adler. Spieler 2 im Modus „Zu zweit“: A/D laufen, W springen, S oder F kicken, G für Adler und H für Zug. Beide spielen lokal an derselben Tastatur. KI-Steuerung, automatische Spezialschüsse und KI-Zielkorrekturen sind für Spieler 2 abgeschaltet.
+
+## Latte und Verlängerung
+
+Die gesamte waagerechte Latte und ihre runden Enden werden entlang der Ballflugstrecke auf Kollision geprüft. Ein reguläres Tor zählt erst, wenn der ganze Ball die Torlinie passiert hat. Bei Gleichstand gibt es nach der regulären Spielzeit einmalig 30 Sekunden Verlängerung mit neuem Anstoß; Spielstand, Schäden und Spezialladungen bleiben erhalten. Danach endet ein weiterhin ausgeglichenes Match unentschieden.
