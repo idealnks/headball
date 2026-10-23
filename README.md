@@ -46,14 +46,20 @@ Spieler 1: Pfeiltasten links/rechts, oben zum Springen, Space zum Kicken, E für
 
 ## Latte und Verlängerung
 
-Die gesamte waagerechte Latte und ihre runden Enden werden entlang der Ballflugstrecke auf Kollision geprüft. Ein reguläres Tor zählt erst, wenn der ganze Ball die Torlinie passiert hat. Bei Gleichstand gibt es nach der regulären Spielzeit einmalig 30 Sekunden Verlängerung mit neuem Anstoß; Spielstand, Schäden und Spezialladungen bleiben erhalten. Danach endet ein weiterhin ausgeglichenes Match unentschieden.
+Die gesamte waagerechte Latte und ihre runden Enden werden entlang der Ballflugstrecke auf Kollision geprüft. Ein reguläres Tor zählt erst, wenn der ganze Ball die Torlinie passiert hat. Bei Gleichstand gibt es nach der regulären Spielzeit einmalig 30 Sekunden Verlängerung mit neuem Anstoß; Spielstand, Schäden und Spezialladungen bleiben erhalten. Danach entscheidet bei weiterem Gleichstand ein Elfmeterschießen.
 
 ## Schwierigkeit und Turnier
 
 Im Startmenü für Einzelspiele gegen KI zwischen Leicht, Normal und Schwer wählen. Diese Stufen variieren Bewegungstempo, Zielstreuung, Ballvorhersage und Sprungreichweite. Der lokale Zweispielermodus verwendet keine KI-Einstellungen.
 
-Im Turnier beginnt dein Weg im Viertelfinale gegen Nico (Leicht), danach folgen Bruno im Halbfinale (Normal) und Titan im Finale (Schwer). Gegner haben unterschiedliche Köpfe und Trikotfarben. Ein Sieg schaltet „Nächste Runde“ frei; eine Niederlage beendet den Lauf. Bei Gleichstand nach der einmaligen 30-Sekunden-Verlängerung entscheidet im Turnier Golden Goal. Jede Runde startet mit frischem Spielstand, Fähigkeiten und geheilten Figuren. Die gewählte Spieldauer gilt pro Runde.
+Im Turnier beginnt dein Weg im Viertelfinale gegen Nico (Leicht), danach folgen Bruno im Halbfinale (Normal) und Titan im Finale (Schwer). Gegner haben unterschiedliche Köpfe und Trikotfarben. Ein Sieg schaltet „Nächste Runde“ frei; eine Niederlage beendet den Lauf. Bei Gleichstand nach der einmaligen 30-Sekunden-Verlängerung entscheidet ein Elfmeterschießen. Jede Runde startet mit frischem Spielstand, Fähigkeiten und geheilten Figuren. Die gewählte Spieldauer gilt pro Runde.
 
 ## Spielfelder
 
 Im Startmenü zwischen Stadion (ebener Rasen), Acker (hügeliger Boden) und Wippfeld wählen. Die Oberfläche beeinflusst Ballabpraller, Figurenhöhe und Bewegung bergauf/bergab. Tore und Zug folgen der Bodenhöhe. Das Wippfeld kippt alle fünf aktiven Spielsekunden sanft in die andere Richtung: zuerst bergab zum Tor von Spieler 1 (Vorteil Gegner), danach umgekehrt. Eine Anzeige nennt die begünstigte Seite und die Zeit bis zum nächsten Wechsel. Bei Pause, Torjubel oder Spezialsequenzen bleibt das Feld stehen. Die Wahl gilt auch für alle Runden eines Turniers.
+
+## Elfmeterschießen
+
+Bei Gleichstand nach der Verlängerung gibt es in allen Modi ein Elfmeterschießen in einer neutralen Frontansicht. Fünf Versuche pro Seite, mit vorzeitiger Entscheidung bei uneinholbarer Führung. Bei weiterem Gleichstand folgen gleich viele zusätzliche Versuche pro Seite, bis eine führt. Ergebnisse werden separat als „i. E.“ geführt; im Turnier kommt der Sieger weiter.
+
+Spieler 1: links/oben/rechts für die Ecke, Space zum Schießen. Als Torwart die Ecke mit denselben Tasten wählen. Spieler 2: A/W/D und F oder S. Gegen KI schießt diese nach kurzer Vorbereitungszeit automatisch. Bildschirmtasten sind ebenfalls verfügbar. Pause funktioniert weiterhin; Spezialfähigkeiten sind im Elfmeterschießen deaktiviert.
