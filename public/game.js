@@ -6,6 +6,7 @@ portrait.src='/player-face.png';
 const aiPortrait=new Image();aiPortrait.src='/ai-face.png';
 let special=null, specialReady=[false,false], specialGranted=[false,false];
 let kickEffects=[];
+let animationTime=0;
 let faceDamage=[0,0], hitCooldown=[0,0], noGoalTime=[0,0], trainReady=[false,false];
 let state = 'ready', time = 120, scores = [0, 0], goalWait = 0, last = 0, accumulator = 0;
 let player, ai, ball;
@@ -84,16 +85,27 @@ function chargeTrain(dt){for(let i=0;i<2;i++){noGoalTime[i]=Math.min(60,noGoalTi
 function activateTrain(side){
  if(state!=='playing'||goalWait>0||special||!trainReady[side])return false;
  trainReady[side]=false;noGoalTime[side]=0;
- const attacker=side===0?player:ai;
+ const attacker=side===0?player:ai,victim=side===0?ai:player;
  attacker.kickTime=.24;attacker.kickDirection=side===0?1:-1;
- special={type:'train',side,elapsed:0,from:{x:ball.x,y:ball.y}};
+ const startX=side===0?Math.min(attacker.x,victim.x-150):Math.max(attacker.x,victim.x+150);
+ special={type:'train',side,elapsed:0,from:{x:startX,y:floor-35},victim,victimStart:{x:victim.x,y:victim.y},impactTime:null};
+ ball.x=startX;ball.y=floor-35;
  kickQueued=false;updateUI();return true;
 }
 function stepTrain(dt){
- const a=special;a.elapsed+=dt;const t=a.elapsed;
- if(t<1){const u=t;ball.x=a.from.x;ball.y=a.from.y+(210-a.from.y)*u;}
- else {const u=Math.min(1,(t-1)/3),e=u*u*(3-2*u);ball.x=a.from.x+((a.side===0?W+90:-90)-a.from.x)*e;ball.y=210+Math.pow(u,5)*145;}
- if(t>=4){const side=a.side;special=null;goal(side);}else updateUI();
+ const a=special,previousX=ball.x;a.elapsed+=dt;const t=a.elapsed,dir=a.side===0?1:-1;
+ const u=Math.min(1,Math.max(0,(t-1)/3)),e=u*u*(3-2*u);
+ ball.x=a.from.x+((a.side===0?W+150:-150)-a.from.x)*e;ball.y=floor-35;
+ if(a.impactTime===null&&t>=1&&(previousX+dir*65-a.victimStart.x)*dir<=0&&(ball.x+dir*65-a.victimStart.x)*dir>=0){
+   a.impactTime=t;a.victim.vy=-650;
+ }
+ if(a.impactTime!==null){
+   const air=t-a.impactTime,height=Math.max(0,650*air-625*air*air);
+   a.victim.y=a.victimStart.y-height;
+   a.victim.x=Math.max(65,Math.min(W-65,a.victimStart.x+dir*Math.min(air,1.04)*90));
+   a.victim.tumble=height>0?dir*air*Math.PI*2:0;
+ }
+ if(t>=4){a.victim.y=a.victimStart.y;a.victim.tumble=0;a.victim.vy=0;const side=a.side;special=null;goal(side);}else updateUI();
 }
 function activateSpecial(side){
  if(state!=='playing'||goalWait>0||special||!specialReady[side])return false;
@@ -110,7 +122,7 @@ function stepSpecial(dt){
  else {a.victim.knocked=true;const u=Math.min(1,(t-4.5)/1.5),e=u*u;ball.x=a.hit.x+((a.side===0?W+20:-20)-a.hit.x)*e;ball.y=a.hit.y+(360-a.hit.y)*e-Math.sin(u*Math.PI)*110;}
  if(t>=6){const side=a.side;special=null;goal(side);}else updateUI();
 }
-function tick(dt){if(state!=='playing')return;if(special){if(special.type==='train')stepTrain(dt);else stepSpecial(dt);return;}grantSpecial();if(goalWait>0){goalWait-=dt;if(goalWait<=0)resetField();return;}if(specialReady[1]){activateSpecial(1);return;}if(trainReady[1]){activateTrain(1);return;}chargeTrain(dt);time=Math.max(0,time-dt);if(time===0){state='ended';show(scores[0]===scores[1]?'Unentschieden.':scores[0]>scores[1]?'Dein Sieg!':'Die KI gewinnt.',`${scores[0]} : ${scores[1]} — Zeit für die Revanche?`,'Noch ein Match');updateUI();return;}
+function tick(dt){if(state!=='playing')return;animationTime+=dt;if(special){if(special.type==='train')stepTrain(dt);else stepSpecial(dt);return;}grantSpecial();if(goalWait>0){goalWait-=dt;if(goalWait<=0)resetField();return;}if(specialReady[1]){activateSpecial(1);return;}if(trainReady[1]){activateTrain(1);return;}chargeTrain(dt);time=Math.max(0,time-dt);if(time===0){state='ended';show(scores[0]===scores[1]?'Unentschieden.':scores[0]>scores[1]?'Dein Sieg!':'Die KI gewinnt.',`${scores[0]} : ${scores[1]} — Zeit für die Revanche?`,'Noch ein Match');updateUI();return;}
 for(const p of [player,ai]){p.kickTime=Math.max(0,p.kickTime-dt);p.cooldown=Math.max(0,p.cooldown-dt);}
 for(const effect of kickEffects)effect.time-=dt;kickEffects=kickEffects.filter(effect=>effect.time>0);
 kickCooldown=Math.max(0,kickCooldown-dt);pressCooldown=Math.max(0,pressCooldown-dt);
@@ -154,8 +166,8 @@ function drawFaceDamage(p){
 function drawTrain(){
  const a=special,t=a.elapsed,dir=a.side===0?1:-1;
  ctx.save();ctx.fillStyle='#09142177';ctx.fillRect(0,0,W,H);
- ctx.strokeStyle='#d6ba7a66';ctx.lineWidth=3;for(const y of [ball.y+30,ball.y+38]){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
- for(let x=0;x<W;x+=28){ctx.beginPath();ctx.moveTo(x,ball.y+27);ctx.lineTo(x+10,ball.y+41);ctx.stroke();}
+ ctx.strokeStyle='#d6ba7a66';ctx.lineWidth=3;for(const y of [floor-2,floor+4]){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+ for(let x=0;x<W;x+=28){ctx.beginPath();ctx.moveTo(x,floor-5);ctx.lineTo(x+10,floor+7);ctx.stroke();}
  ctx.translate(ball.x,ball.y);ctx.scale(dir,1);
  for(let i=0;i<7;i++){ctx.globalAlpha=(1-i/7)*.35;ctx.fillStyle='#eee7cf';ctx.beginPath();ctx.arc(20-i*23, -54-i*6+Math.sin(t*5+i)*5,10+i*3,0,Math.PI*2);ctx.fill();}ctx.globalAlpha=1;
  roundRect(-115,-15,49,38,5,'#ce9b45');roundRect(-61,-15,49,38,5,'#ce9b45');
@@ -164,7 +176,8 @@ function drawTrain(){
  for(const x of [-102,-78,-48,-24,5,34]){ctx.fillStyle='#203b42';ctx.beginPath();ctx.arc(x,24,11,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#ead39b';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x,24);ctx.lineTo(x+Math.cos(t*16)*8,24+Math.sin(t*16)*8);ctx.stroke();}
  ctx.restore();ctx.save();ctx.textAlign='center';ctx.fillStyle='#ffe29a';ctx.font='bold 24px sans-serif';ctx.fillText('TOR-EXPRESS',W/2,85);ctx.font='12px sans-serif';ctx.fillText(t<1?'ALLE EINSTEIGEN!':'NÄCHSTER HALT: GEGNERISCHES TOR',W/2,108);ctx.restore();
 }
-function drawPerson(p){ctx.save();if(p.knocked){ctx.translate(p.x,floor);ctx.rotate((p===player?-1:1)*Math.PI/2*(special?Math.min(1,Math.max(0,(special.elapsed-3.1)/.4)):1));ctx.translate(-p.x,-floor);}ctx.fillStyle='#061b173b';ctx.beginPath();ctx.ellipse(p.x,floor+5,36,7,0,0,Math.PI*2);ctx.fill();roundRect(p.x-19,p.y-5,38,38,12,p.color);roundRect(p.x-23,p.y+25,20,17,6,'#102d30');roundRect(p.x+3,p.y+25,20,17,6,'#102d30');drawKick(p);const head=p===player?portrait:aiPortrait;if(head.complete&&head.naturalWidth){ctx.drawImage(head,p.x-50,p.y-79,100,84);drawFaceDamage(p);ctx.restore();return;}ctx.fillStyle='#e9b28d';ctx.beginPath();ctx.arc(p.x,p.y-35,35,0,Math.PI*2);ctx.fill();ctx.fillStyle='#29342e';ctx.beginPath();ctx.arc(p.x,p.y-43,33,Math.PI,Math.PI*2);ctx.lineTo(p.x+27,p.y-45);ctx.quadraticCurveTo(p.x,p.y-65,p.x-32,p.y-38);ctx.fill();ctx.fillStyle='#fff5df';for(const x of [-11,13]){ctx.beginPath();ctx.ellipse(p.x+x,p.y-34,7,9,0,0,Math.PI*2);ctx.fill();}ctx.fillStyle='#26362c';for(const x of [-11,13]){ctx.beginPath();ctx.arc(p.x+x+p.face*2,p.y-33,3,0,Math.PI*2);ctx.fill();}ctx.strokeStyle='#955c43';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x+3,p.y-20,9,.2,2.6);ctx.stroke();drawFaceDamage(p);ctx.restore();}
+function headMotion(p){const phase=animationTime*(Math.abs(p.vx)>10?10:2.5)+(p===ai?1.4:0);return {angle:Math.sin(phase)*(Math.abs(p.vx)>10?.055:.025),bob:Math.sin(phase*1.3)*1.5};}
+function drawPerson(p){ctx.save();if(p.tumble){ctx.translate(p.x,p.y);ctx.rotate(p.tumble);ctx.translate(-p.x,-p.y);}if(p.knocked){ctx.translate(p.x,floor);ctx.rotate((p===player?-1:1)*Math.PI/2*(special?Math.min(1,Math.max(0,(special.elapsed-3.1)/.4)):1));ctx.translate(-p.x,-floor);}ctx.fillStyle='#061b173b';ctx.beginPath();ctx.ellipse(p.x,floor+5,36,7,0,0,Math.PI*2);ctx.fill();roundRect(p.x-19,p.y-5,38,38,12,p.color);roundRect(p.x-23,p.y+25,20,17,6,'#102d30');roundRect(p.x+3,p.y+25,20,17,6,'#102d30');drawKick(p);const motion=headMotion(p);ctx.save();ctx.translate(p.x,p.y-3+motion.bob);ctx.rotate(motion.angle);ctx.scale(1.15,1.15);ctx.translate(-p.x,-(p.y-3));const head=p===player?portrait:aiPortrait;if(head.complete&&head.naturalWidth){ctx.drawImage(head,p.x-50,p.y-79,100,84);drawFaceDamage(p);ctx.restore();ctx.restore();return;}ctx.fillStyle='#e9b28d';ctx.beginPath();ctx.arc(p.x,p.y-35,35,0,Math.PI*2);ctx.fill();ctx.fillStyle='#29342e';ctx.beginPath();ctx.arc(p.x,p.y-43,33,Math.PI,Math.PI*2);ctx.lineTo(p.x+27,p.y-45);ctx.quadraticCurveTo(p.x,p.y-65,p.x-32,p.y-38);ctx.fill();ctx.fillStyle='#fff5df';for(const x of [-11,13]){ctx.beginPath();ctx.ellipse(p.x+x,p.y-34,7,9,0,0,Math.PI*2);ctx.fill();}ctx.fillStyle='#26362c';for(const x of [-11,13]){ctx.beginPath();ctx.arc(p.x+x+p.face*2,p.y-33,3,0,Math.PI*2);ctx.fill();}ctx.strokeStyle='#955c43';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x+3,p.y-20,9,.2,2.6);ctx.stroke();drawFaceDamage(p);ctx.restore();ctx.restore();}
 function drawEagle(){
  const t=special.elapsed,direction=special.side===0?1:-1,flap=Math.sin(t*16)*22;
  ctx.save();ctx.fillStyle='#080c19aa';ctx.fillRect(0,0,W,H);
