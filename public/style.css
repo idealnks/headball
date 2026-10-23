@@ -8,3 +8,5 @@
 .fieldfooter #train{color:#ffd394;border:1px solid #ffd39466;border-radius:5px;padding:7px}.fieldfooter #train:disabled{color:#82937e;border-color:#82937e33;cursor:default}.fieldfooter{flex-wrap:wrap}
 
 .menu-settings{display:grid;gap:8px;text-align:left;margin:20px 0}.menu-settings label{font-size:9px;letter-spacing:1.5px;color:#b7c7a7}.menu-settings select{font:inherit;font-size:12px;border:1px solid #6c8055;border-radius:5px;background:#243c2e;color:#edf2d9;padding:10px;width:100%}.menu-settings[hidden]{display:none}.arena:has(#menu-settings:not([hidden])){min-height:590px}.overlay:has(#menu-settings:not([hidden])){top:50%}#p2-controls{color:#edc89f}
+
+.tournament-progress{padding:12px 18px;background:#263e29;color:#dfed9e;font-size:11px;line-height:1.7}.tournament-progress[hidden]{display:none}.menu-settings #tournament-info{font-size:10px;line-height:1.6;margin:0;color:#b9c9a5}.menu-settings select:disabled{opacity:.45}.arena:has(#menu-settings:not([hidden])){min-height:700px}.overlay:has(#menu-settings:not([hidden])){min-width:340px}@media(max-width:700px){.overlay:has(#menu-settings:not([hidden])){min-width:280px;width:calc(100% - 36px)}}

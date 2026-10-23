@@ -47,3 +47,9 @@ Spieler 1: Pfeiltasten links/rechts, oben zum Springen, Space zum Kicken, E für
 ## Latte und Verlängerung
 
 Die gesamte waagerechte Latte und ihre runden Enden werden entlang der Ballflugstrecke auf Kollision geprüft. Ein reguläres Tor zählt erst, wenn der ganze Ball die Torlinie passiert hat. Bei Gleichstand gibt es nach der regulären Spielzeit einmalig 30 Sekunden Verlängerung mit neuem Anstoß; Spielstand, Schäden und Spezialladungen bleiben erhalten. Danach endet ein weiterhin ausgeglichenes Match unentschieden.
+
+## Schwierigkeit und Turnier
+
+Im Startmenü für Einzelspiele gegen KI zwischen Leicht, Normal und Schwer wählen. Diese Stufen variieren Bewegungstempo, Zielstreuung, Ballvorhersage und Sprungreichweite. Der lokale Zweispielermodus verwendet keine KI-Einstellungen.
+
+Im Turnier beginnt dein Weg im Viertelfinale gegen Nico (Leicht), danach folgen Bruno im Halbfinale (Normal) und Titan im Finale (Schwer). Gegner haben unterschiedliche Köpfe und Trikotfarben. Ein Sieg schaltet „Nächste Runde“ frei; eine Niederlage beendet den Lauf. Bei Gleichstand nach der einmaligen 30-Sekunden-Verlängerung entscheidet im Turnier Golden Goal. Jede Runde startet mit frischem Spielstand, Fähigkeiten und geheilten Figuren. Die gewählte Spieldauer gilt pro Runde.
