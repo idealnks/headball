@@ -37,9 +37,24 @@ function kick(p=player){
 }
 // Solve the flight to the goal including the horizontal air drag used below.
 function aimAIShot(){
- const distance=Math.max(35,ball.x-radius),speed=660,drag=-Math.log(.998)*120;
+ const miss=Math.random()<.3;
+ const targetY=miss?(Math.random()<.65?210:435):300+(Math.random()-.5)*40;
+ const distance=Math.max(35,ball.x-radius),speed=610+Math.random()*70,drag=-Math.log(.998)*120;
  const flight=-Math.log(Math.max(.1,1-distance*drag/speed))/drag;
- ball.vx=-speed;ball.vy=Math.max(-840,Math.min(180,(300-ball.y-460*flight*flight)/flight));
+ ball.vx=-speed;ball.vy=Math.max(-840,Math.min(180,(targetY-ball.y-460*flight*flight)/flight));
+}
+// Full-height collision bounds include the large head and feet. A jump can
+// clear an opponent, but overlapping bodies cannot swap sides or leave the field.
+function resolvePlayers(){
+ if(player.knocked||ai.knocked||Math.abs(player.y-ai.y)>=118)return;
+ const left=player.x<=ai.x?player:ai,right=left===player?ai:player;
+ const overlap=70-(right.x-left.x);
+ if(overlap<=0)return;
+ left.x-=overlap/2;right.x+=overlap/2;
+ if(left.x<65){right.x+=65-left.x;left.x=65;}
+ if(right.x>W-65){left.x-=right.x-(W-65);right.x=W-65;}
+ const shared=(left.vx+right.vx)/2;
+ left.vx=shared;right.vx=shared;
 }
 function pressBall(){
   if(pressCooldown>0)return;
@@ -82,6 +97,7 @@ personStep(player,(keys.has('ArrowRight')?1:0)-(keys.has('ArrowLeft')?1:0),keys.
 // Approach from the right on both halves to attack the human's goal.
 const target=Math.max(65,Math.min(W-65,ball.x+53+Math.max(-100,Math.min(100,ball.vx*.2))));
 personStep(ai,Math.abs(target-ai.x)>12?Math.sign(target-ai.x):0,Math.abs(ball.x-ai.x)<105&&ball.y>245&&ball.y<355&&ball.vy>40&&ball.x<ai.x,dt);
+resolvePlayers();
 if(Math.abs(ball.x-ai.x)<90)ai.face=ball.x<ai.x?-1:1;
 if(ball.x<=ai.x+12&&ai.x-ball.x<=85&&ball.y>=ai.y-22&&ball.y<=ai.y+55)kick(ai);
 if(kickQueued){kickQueued=false;kick();}

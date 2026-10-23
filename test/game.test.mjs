@@ -2,10 +2,11 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
-function game(){
+function game(seed=42){
+ const math=Object.create(Math);math.random=()=>{seed=(1664525*seed+1013904223)>>>0;return seed/4294967296;};
  const handlers={};const elements=new Map();
  const element=()=>({textContent:'',innerHTML:'',hidden:false,focus(){},querySelector(){return element();},getContext(){return {};}});
- const context=vm.createContext({Math,Image:class {},document:{querySelector(s){if(!elements.has(s))elements.set(s,element());return elements.get(s);},querySelectorAll(){return [];}},window:{addEventListener(name,fn){handlers[name]=fn;}},requestAnimationFrame(){}});
+ const context=vm.createContext({Math:math,Image:class {},document:{querySelector(s){if(!elements.has(s))elements.set(s,element());return elements.get(s);},querySelectorAll(){return [];}},window:{addEventListener(name,fn){handlers[name]=fn;}},requestAnimationFrame(){}});
  vm.runInContext(readFileSync(new URL('../public/game.js',import.meta.url),'utf8'),context);
  return {run:s=>vm.runInContext(s,context),key:(repeat=false)=>handlers.keydown({key:' ',code:'Space',repeat,preventDefault(){}})};
 }
@@ -26,3 +27,8 @@ test('unearned special and special during goal celebration cannot activate',()=>
 test('duration offers 60, 120 or 180 seconds and restart uses selected duration',()=>{const g=game();for(const seconds of [60,120,180]){g.run(`document.querySelector('#duration').value='${seconds}';begin()`);assert.equal(g.run('time'),seconds);}});
 test('AI scores without special shots against an idle human',()=>{for(const x of [65,300,550]){const g=game();g.run(`begin();player.x=${x};specialGranted=[true,true];ball.vx=0;for(let n=0;n<7200&&scores[1]===0;n++)tick(1/120)`);assert.ok(g.run('scores[1]>0'),`AI failed to score against idle player at ${x}`);}});
 test('raised goal accepts a shot over a standing keeper but a jumping keeper blocks it',()=>{for(const jumping of [false,true]){const g=game();g.run(`begin();player.x=65;player.y=${jumping?340:400};ai.x=1000;ball={x:130,y:300,vx:-600,vy:-30};for(let n=0;n<30;n++)tick(1/120)`);assert.equal(g.run('scores[1]'),jumping?0:1);}});
+
+test('figures block each other and cannot exchange sides when running together',()=>{const g=game();g.run('begin();player.x=500;ai.x=570;keys.add("ArrowRight");ball={x:300,y:100,vx:0,vy:0};for(let n=0;n<120;n++){tick(1/120);if(ai.x-player.x<69.99)throw Error("Players overlap")}');assert.ok(g.run('player.x<ai.x'));});
+test('player collisions keep both figures inside either field edge',()=>{const g=game();for(const positions of [[65,90],[1010,1035]]){g.run(`begin();player.x=${positions[0]};ai.x=${positions[1]};resolvePlayers()`);assert.ok(g.run('player.x>=65&&ai.x<=W-65&&ai.x-player.x>=70'));}});
+test('jump clearance allows passing above but partial jumps still collide',()=>{const g=game();g.run('begin();player.x=500;ai.x=530;player.y=300;resolvePlayers()');assert.equal(g.run('ai.x-player.x'),70);g.run('player.x=500;ai.x=530;player.y=270;resolvePlayers()');assert.equal(g.run('ai.x-player.x'),30);});
+test('AI aim has both accurate shots and shots above the crossbar',()=>{const g=game(123);let misses=0,hits=0;for(let n=0;n<100;n++){g.run('ball={x:500,y:410,vx:0,vy:0};aimAIShot()');const y=g.run('(()=>{const drag=-Math.log(.998)*120,t=-Math.log(1-(ball.x-radius)*drag/-ball.vx)/drag;return ball.y+ball.vy*t+460*t*t;})()');if(y<265)misses++;if(y>=280&&y<=320)hits++;}assert.ok(misses>=10&&hits>=45,`misses=${misses}, accurate=${hits}`);});

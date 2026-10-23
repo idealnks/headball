@@ -27,3 +27,5 @@ Physik- und KI-Tests: `node --test`.
 Ab drei Toren Rückstand (z. B. 2:5) bekommt die zurückliegende Seite einmal pro Match einen Spezialschuss. Für den Menschen: Taste S oder Adler-Button. Die KI aktiviert automatisch nach der Torpause. Der Ball verwandelt sich in einen Doppelkopfadler, wirft den Gegner um und erzielt garantiert genau ein Tor. Die sechs Sekunden lange Inszenierung umfasst Aufladung, Spiralflug, Einschlag und Torflug. Die Spielzeit pausiert während der Sequenz. Neustart setzt die Fähigkeit zurück. Der KI-Kopf aus dem bereitgestellten Bild liegt in `public/ai-face.png`.
 
 Die größeren Tore lassen hohe Bälle über stehende Figuren hinweg passieren; Springen ermöglicht die Abwehr. Die KI berechnet die Schussbahn einschließlich Luftwiderstand und zielt auf den oberen freien Torbereich.
+
+Die KI variiert Zielhöhe und Schussstärke; bei 30 % ihrer normalen Schüsse wählt sie ein ungenaues Ziel. Figuren blockieren und schieben einander bei Körperkontakt. Ein vollständig übersprungener Gegner kann überquert werden. Der garantierte Spezialschuss bleibt unhaltbar.
