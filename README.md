@@ -53,3 +53,7 @@ Die gesamte waagerechte Latte und ihre runden Enden werden entlang der Ballflugs
 Im Startmenü für Einzelspiele gegen KI zwischen Leicht, Normal und Schwer wählen. Diese Stufen variieren Bewegungstempo, Zielstreuung, Ballvorhersage und Sprungreichweite. Der lokale Zweispielermodus verwendet keine KI-Einstellungen.
 
 Im Turnier beginnt dein Weg im Viertelfinale gegen Nico (Leicht), danach folgen Bruno im Halbfinale (Normal) und Titan im Finale (Schwer). Gegner haben unterschiedliche Köpfe und Trikotfarben. Ein Sieg schaltet „Nächste Runde“ frei; eine Niederlage beendet den Lauf. Bei Gleichstand nach der einmaligen 30-Sekunden-Verlängerung entscheidet im Turnier Golden Goal. Jede Runde startet mit frischem Spielstand, Fähigkeiten und geheilten Figuren. Die gewählte Spieldauer gilt pro Runde.
+
+## Spielfelder
+
+Im Startmenü zwischen Stadion (ebener Rasen), Acker (hügeliger Boden) und Wippfeld wählen. Die Oberfläche beeinflusst Ballabpraller, Figurenhöhe und Bewegung bergauf/bergab. Tore und Zug folgen der Bodenhöhe. Das Wippfeld kippt alle fünf aktiven Spielsekunden sanft in die andere Richtung: zuerst bergab zum Tor von Spieler 1 (Vorteil Gegner), danach umgekehrt. Eine Anzeige nennt die begünstigte Seite und die Zeit bis zum nächsten Wechsel. Bei Pause, Torjubel oder Spezialsequenzen bleibt das Feld stehen. Die Wahl gilt auch für alle Runden eines Turniers.
