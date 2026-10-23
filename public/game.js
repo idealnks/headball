@@ -10,17 +10,31 @@ let animationTime=0;
 let faceDamage=[0,0], hitCooldown=[0,0], noGoalTime=[0,0], trainReady=[false,false];
 let state = 'ready', time = 120, scores = [0, 0], goalWait = 0, last = 0, accumulator = 0;
 let player, ai, ball;
+let mode='ai', secondKickQueued=false;
 let kickQueued=false, kickCooldown=0, pressCooldown=0;
 const overlay = document.querySelector('#overlay'), start = document.querySelector('#start');
-function resetField(){kickQueued=false;kickCooldown=0;pressCooldown=0;kickEffects=[];player={x:300,y:floor-48,vx:0,vy:0,color:'#69c5ed',face:1,kickTime:0,kickDirection:1,cooldown:0};ai={x:800,y:floor-48,vx:0,vy:0,color:'#f1a36e',face:-1,kickTime:0,kickDirection:-1,cooldown:0};ball={x:550,y:160,vx:(Math.random()-.5)*160,vy:0};}
+function resetField(){kickQueued=false;secondKickQueued=false;keys.clear();kickCooldown=0;pressCooldown=0;kickEffects=[];player={x:300,y:floor-48,vx:0,vy:0,color:'#69c5ed',face:1,kickTime:0,kickDirection:1,cooldown:0};ai={x:800,y:floor-48,vx:0,vy:0,color:'#f1a36e',face:-1,kickTime:0,kickDirection:-1,cooldown:0};ball={x:550,y:160,vx:(Math.random()-.5)*160,vy:0};}
 function selectedDuration(){const value=Number(document.querySelector('#duration').value);return [60,120,180].includes(value)?value:120;}
-function begin(){faceDamage=[0,0];hitCooldown=[0,0];noGoalTime=[0,0];trainReady=[false,false];special=null;specialReady=[false,false];specialGranted=[false,false];scores=[0,0];time=selectedDuration();goalWait=0;resetField();state='playing';overlay.hidden=true;canvas.focus();updateUI();}
-function updateUI(){const trainButton=document.querySelector('#train');trainButton.disabled=state!=='playing'||!trainReady[0]||!!special||goalWait>0;trainButton.textContent=trainReady[0]?'Z · ZUG BEREIT':`Z · Zug (${Math.max(0,Math.ceil(60-noGoalTime[0]))} s)`;document.querySelector('#score').textContent=`${scores[0]} : ${scores[1]}`;document.querySelector('#clock').textContent=`${String(Math.floor(Math.ceil(time)/60)).padStart(2,'0')}:${String(Math.ceil(time)%60).padStart(2,'0')}`;document.querySelector('#special').disabled=state!=='playing'||!specialReady[0]||!!special||goalWait>0;document.querySelector('#special').textContent=specialReady[0]?'S · ADLER BEREIT':'S · Adler (−3 Tore)';document.querySelector('#status').textContent=special?(special.type==='train'?'TOR-EXPRESS!':'DOPPELKOPFADLER!'):specialReady[0]&&state==='playing'?'SPEZIAL BEREIT · S DRÜCKEN':state==='playing'?'MATCH LÄUFT':state==='paused'?'MATCH PAUSIERT':state==='ended'?'ABPFIFF':'BEREIT ZUM ANPFIFF';}
-function show(title,sub,label){overlay.hidden=false;overlay.querySelector('h2').textContent=title;overlay.querySelector('p').textContent=sub;start.innerHTML=label+' <span>↗</span>';}
-function pause(){kickQueued=false;if(state==='playing'){state='paused';show('Kurze Halbzeit.','Durchatmen. Dein Match wartet.','Weiterspielen');}else if(state==='paused'){state='playing';overlay.hidden=true;canvas.focus();}updateUI();}
-start.onclick=()=>state==='paused'?pause():begin();document.querySelector('#restart').onclick=begin;document.querySelector('#pause').onclick=pause;document.querySelector('#special').onclick=()=>activateSpecial(0);document.querySelector('#train').onclick=()=>activateTrain(0);
-window.addEventListener('keydown',e=>{if(e.key.startsWith('Arrow')){e.preventDefault();keys.add(e.key);}if(e.code==='KeyZ'&&!e.repeat){e.preventDefault();activateTrain(0);}if(e.code==='KeyS'&&!e.repeat){e.preventDefault();activateSpecial(0);}if(e.code==='Space'){e.preventDefault();if(!e.repeat&&state==='playing')kickQueued=true;}});
-window.addEventListener('keyup',e=>keys.delete(e.key));window.addEventListener('blur',()=>{keys.clear();kickQueued=false;if(state==='playing')pause();});
+function begin(){mode=document.querySelector('#mode').value==='local'?'local':'ai';document.querySelector('#opponent-label').textContent=mode==='local'?'SPIELER 2':'KI';document.querySelector('#mode-label').textContent=mode==='local'?'Du gegen Spieler 2':'Du gegen KI';document.querySelector('#p2-controls').hidden=mode!=='local';faceDamage=[0,0];hitCooldown=[0,0];noGoalTime=[0,0];trainReady=[false,false];special=null;specialReady=[false,false];specialGranted=[false,false];scores=[0,0];time=selectedDuration();goalWait=0;resetField();state='playing';overlay.hidden=true;canvas.focus();updateUI();}
+function updateUI(){const trainButton=document.querySelector('#train');trainButton.disabled=state!=='playing'||!trainReady[0]||!!special||goalWait>0;trainButton.textContent=trainReady[0]?'Z · ZUG BEREIT':`Z · Zug (${Math.max(0,Math.ceil(60-noGoalTime[0]))} s)`;document.querySelector('#score').textContent=`${scores[0]} : ${scores[1]}`;document.querySelector('#clock').textContent=`${String(Math.floor(Math.ceil(time)/60)).padStart(2,'0')}:${String(Math.ceil(time)%60).padStart(2,'0')}`;document.querySelector('#special').disabled=state!=='playing'||!specialReady[0]||!!special||goalWait>0;document.querySelector('#special').textContent=specialReady[0]?'E · ADLER BEREIT':'E · Adler (−3 Tore)';document.querySelector('#status').textContent=special?(special.type==='train'?'TOR-EXPRESS!':'DOPPELKOPFADLER!'):specialReady[0]&&state==='playing'?'SPEZIAL BEREIT · E DRÜCKEN':state==='playing'?'MATCH LÄUFT':state==='paused'?'MATCH PAUSIERT':state==='ended'?'ABPFIFF':'BEREIT ZUM ANPFIFF';}
+function show(title,sub,label){overlay.hidden=false;document.querySelector('#menu-settings').hidden=state==='paused';overlay.querySelector('h2').textContent=title;overlay.querySelector('p').textContent=sub;start.innerHTML=label+' <span>↗</span>';}
+function pause(){kickQueued=false;secondKickQueued=false;keys.clear();if(state==='playing'){state='paused';show('Kurze Halbzeit.','Durchatmen. Dein Match wartet.','Weiterspielen');}else if(state==='paused'){state='playing';overlay.hidden=true;canvas.focus();}updateUI();}
+start.onclick=()=>state==='paused'?pause():begin();document.querySelector('#restart').onclick=()=>{state='ready';keys.clear();kickQueued=false;secondKickQueued=false;show('Neues Match.','Wähle Spielmodus und Spieldauer.','Match starten');updateUI();};document.querySelector('#pause').onclick=pause;document.querySelector('#special').onclick=()=>activateSpecial(0);document.querySelector('#train').onclick=()=>activateTrain(0);
+window.addEventListener('keydown',e=>{
+ if(e.target?.tagName==='SELECT')return;
+ if(e.key.startsWith('Arrow')){e.preventDefault();if(state==='playing')keys.add(e.key);}
+ if(mode==='local'&&['KeyA','KeyD','KeyW'].includes(e.code)){e.preventDefault();if(state==='playing')keys.add(e.code);}
+ if(e.repeat||state!=='playing')return;
+ if(e.code==='KeyZ'){e.preventDefault();activateTrain(0);}
+ if(e.code==='KeyE'||(e.code==='KeyS'&&mode==='ai')){e.preventDefault();activateSpecial(0);}
+ if(e.code==='Space'){e.preventDefault();kickQueued=true;}
+ if(mode==='local'){
+   if(['KeyS','KeyF'].includes(e.code)){e.preventDefault();secondKickQueued=true;}
+   if(e.code==='KeyG'){e.preventDefault();activateSpecial(1);}
+   if(e.code==='KeyH'){e.preventDefault();activateTrain(1);}
+ }
+});
+window.addEventListener('keyup',e=>{keys.delete(e.key);keys.delete(e.code);});window.addEventListener('blur',()=>{keys.clear();kickQueued=false;secondKickQueued=false;if(state==='playing')pause();});
 document.querySelectorAll('[data-key]').forEach(button=>{button.onpointerdown=e=>{e.preventDefault();button.setPointerCapture(e.pointerId);if(button.dataset.key==='Space'){if(state==='playing')kickQueued=true;}else keys.add(button.dataset.key);};button.onpointerup=button.onpointercancel=()=>keys.delete(button.dataset.key);});
 function personStep(p,dir,jump,dt){if(p.knocked)return;p.vx=dir*290;p.x=Math.max(65,Math.min(W-65,p.x+p.vx*dt));if(jump&&p.y>=floor-48-.1)p.vy=-570;p.vy+=1300*dt;p.y+=p.vy*dt;if(p.y>floor-48){p.y=floor-48;p.vy=0;}if(dir)p.face=dir;}
 // A short, directional kick lifts low balls back into heading range.
@@ -39,7 +53,7 @@ function kick(p=player){
     ball.vx=p.face*460+p.vx*.2;
     kickEffects.push({x:ball.x,y:ball.y,time:.22});
     ball.vy=-650;
-    if(p===ai)aimAIShot();
+    if(p===ai&&mode==='ai')aimAIShot();
   }
 }
 // Solve the flight to the goal including the horizontal air drag used below.
@@ -122,22 +136,25 @@ function stepSpecial(dt){
  else {a.victim.knocked=true;const u=Math.min(1,(t-4.5)/1.5),e=u*u;ball.x=a.hit.x+((a.side===0?W+20:-20)-a.hit.x)*e;ball.y=a.hit.y+(360-a.hit.y)*e-Math.sin(u*Math.PI)*110;}
  if(t>=6){const side=a.side;special=null;goal(side);}else updateUI();
 }
-function tick(dt){if(state!=='playing')return;animationTime+=dt;if(special){if(special.type==='train')stepTrain(dt);else stepSpecial(dt);return;}grantSpecial();if(goalWait>0){goalWait-=dt;if(goalWait<=0)resetField();return;}if(specialReady[1]){activateSpecial(1);return;}if(trainReady[1]){activateTrain(1);return;}chargeTrain(dt);time=Math.max(0,time-dt);if(time===0){state='ended';show(scores[0]===scores[1]?'Unentschieden.':scores[0]>scores[1]?'Dein Sieg!':'Die KI gewinnt.',`${scores[0]} : ${scores[1]} — Zeit für die Revanche?`,'Noch ein Match');updateUI();return;}
+function tick(dt){if(state!=='playing')return;animationTime+=dt;if(special){if(special.type==='train')stepTrain(dt);else stepSpecial(dt);return;}grantSpecial();if(goalWait>0){goalWait-=dt;if(goalWait<=0)resetField();return;}if(mode==='ai'&&specialReady[1]){activateSpecial(1);return;}if(mode==='ai'&&trainReady[1]){activateTrain(1);return;}chargeTrain(dt);time=Math.max(0,time-dt);if(time===0){state='ended';show(scores[0]===scores[1]?'Unentschieden.':scores[0]>scores[1]?'Dein Sieg!':mode==='local'?'Spieler 2 gewinnt!':'Die KI gewinnt.',`${scores[0]} : ${scores[1]} — Zeit für die Revanche?`,'Noch ein Match');updateUI();return;}
 for(const p of [player,ai]){p.kickTime=Math.max(0,p.kickTime-dt);p.cooldown=Math.max(0,p.cooldown-dt);}
 for(const effect of kickEffects)effect.time-=dt;kickEffects=kickEffects.filter(effect=>effect.time>0);
 kickCooldown=Math.max(0,kickCooldown-dt);pressCooldown=Math.max(0,pressCooldown-dt);
 personStep(player,(keys.has('ArrowRight')?1:0)-(keys.has('ArrowLeft')?1:0),keys.has('ArrowUp'),dt);
-// Approach from the right on both halves to attack the human's goal.
-const target=Math.max(65,Math.min(W-65,ball.x+53+Math.max(-100,Math.min(100,ball.vx*.2))));
-personStep(ai,Math.abs(target-ai.x)>12?Math.sign(target-ai.x):0,Math.abs(ball.x-ai.x)<105&&ball.y>245&&ball.y<355&&ball.vy>40&&ball.x<ai.x,dt);
+if(mode==='ai'){
+ // Approach from the right on both halves to attack the human's goal.
+ const target=Math.max(65,Math.min(W-65,ball.x+53+Math.max(-100,Math.min(100,ball.vx*.2))));
+ personStep(ai,Math.abs(target-ai.x)>12?Math.sign(target-ai.x):0,Math.abs(ball.x-ai.x)<105&&ball.y>245&&ball.y<355&&ball.vy>40&&ball.x<ai.x,dt);
+ if(Math.abs(ball.x-ai.x)<90)ai.face=ball.x<ai.x?-1:1;
+}else personStep(ai,(keys.has('KeyD')?1:0)-(keys.has('KeyA')?1:0),keys.has('KeyW'),dt);
 resolvePlayers();
-if(Math.abs(ball.x-ai.x)<90)ai.face=ball.x<ai.x?-1:1;
-if(ball.x<=ai.x+12&&ai.x-ball.x<=85&&ball.y>=ai.y-22&&ball.y<=ai.y+55)kick(ai);
+if(mode==='ai'&&ball.x<=ai.x+12&&ai.x-ball.x<=85&&ball.y>=ai.y-22&&ball.y<=ai.y+55)kick(ai);
+if(secondKickQueued){secondKickQueued=false;kick(ai);}
 if(kickQueued){kickQueued=false;kick();}
 ball.vy+=920*dt;ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;ball.vx*=Math.pow(.998,dt*120);
 if(ball.y<radius){ball.y=radius;ball.vy=Math.abs(ball.vy)*.9;}if(ball.y>floor-radius){ball.y=floor-radius;ball.vy=-Math.abs(ball.vy)*.87;if(Math.abs(ball.vy)<100)ball.vy=-170;}
 pressBall();
-for(const p of [player,ai]){const headY=p.y-35,dx=ball.x-p.x,dy=ball.y-headY,dist=Math.hypot(dx,dy),reach=radius+35;if(dist<reach){const nx=dist?dx/dist:p.face,ny=dist?dy/dist:-1;ball.x=p.x+nx*reach;ball.y=headY+ny*reach;const rel=(ball.vx-p.vx)*nx+(ball.vy-p.vy)*ny;if(rel<0){ball.vx-=1.85*rel*nx;ball.vy-=1.85*rel*ny;}ball.vx+=p.vx*.22;ball.vy-=p.vy<0?85:0;if(p===ai&&dx<0)aimAIShot();}
+for(const p of [player,ai]){const headY=p.y-35,dx=ball.x-p.x,dy=ball.y-headY,dist=Math.hypot(dx,dy),reach=radius+35;if(dist<reach){const nx=dist?dx/dist:p.face,ny=dist?dy/dist:-1;ball.x=p.x+nx*reach;ball.y=headY+ny*reach;const rel=(ball.vx-p.vx)*nx+(ball.vy-p.vy)*ny;if(rel<0){ball.vx-=1.85*rel*nx;ball.vy-=1.85*rel*ny;}ball.vx+=p.vx*.22;ball.vy-=p.vy<0?85:0;if(p===ai&&mode==='ai'&&dx<0)aimAIShot();}
 // The torso also blocks the ball instead of letting it pass through a player.
 if(Math.abs(ball.x-p.x)<32&&ball.y>p.y-5&&ball.y<floor){ball.vx=(ball.x>=p.x?1:-1)*Math.max(180,Math.abs(ball.vx));ball.x=p.x+Math.sign(ball.vx)*33;}}
 ball.vx=Math.max(-780,Math.min(780,ball.vx));ball.vy=Math.max(-850,Math.min(850,ball.vy));

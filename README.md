@@ -24,7 +24,7 @@ Physik- und KI-Tests: `node --test`.
 
 ## Doppelkopfadler-Spezial
 
-Ab drei Toren Rückstand (z. B. 2:5) bekommt die zurückliegende Seite einmal pro Match einen Spezialschuss. Für den Menschen: Taste S oder Adler-Button. Die KI aktiviert automatisch nach der Torpause. Der Ball verwandelt sich in einen Doppelkopfadler, wirft den Gegner um und erzielt garantiert genau ein Tor. Die sechs Sekunden lange Inszenierung umfasst Aufladung, Spiralflug, Einschlag und Torflug. Die Spielzeit pausiert während der Sequenz. Neustart setzt die Fähigkeit zurück. Der KI-Kopf aus dem bereitgestellten Bild liegt in `public/ai-face.png`.
+Ab drei Toren Rückstand (z. B. 2:5) bekommt die zurückliegende Seite einmal pro Match einen Spezialschuss. Für den Menschen: Taste E oder Adler-Button. Die KI aktiviert automatisch nach der Torpause. Der Ball verwandelt sich in einen Doppelkopfadler, wirft den Gegner um und erzielt garantiert genau ein Tor. Die sechs Sekunden lange Inszenierung umfasst Aufladung, Spiralflug, Einschlag und Torflug. Die Spielzeit pausiert während der Sequenz. Neustart setzt die Fähigkeit zurück. Der KI-Kopf aus dem bereitgestellten Bild liegt in `public/ai-face.png`.
 
 Die größeren Tore lassen hohe Bälle über stehende Figuren hinweg passieren; Springen ermöglicht die Abwehr. Die KI berechnet die Schussbahn einschließlich Luftwiderstand und zielt auf den oberen freien Torbereich.
 
@@ -37,3 +37,9 @@ Kicks gegen eine nahe Figur in Blickrichtung hinterlassen zunächst stilisierte 
 Nach 60 aktiven Spielsekunden ohne eigenes Tor lädt sich der Tor-Express auf. Mit Z oder dem Zug-Button aktivieren; die KI nutzt ihn automatisch. Der Ball wird zum Zug, fährt auf dem Rasen, schleudert den Gegner beim Zusammenstoß mit einer Drehung in die Luft und trifft garantiert ins Tor. Danach lädt die Fähigkeit erneut; ein eigenes Tor setzt die Ladung zurück. Pause, Torjubel und Spezialsequenzen zählen nicht als Ladezeit. Adler und Zug können nicht gleichzeitig laufen.
 
 Beide Köpfe sind um 15 % vergrößert und wippen leicht; beim Laufen stärker als im Stand. Schrammen bewegen sich mit dem Kopf.
+
+## Startmenü und lokaler Zweispielermodus
+
+Spieldauer (1/2/3 Minuten) und Spielmodus werden im Menü vor dem Anpfiff ausgewählt. „Neues Match“ öffnet dieses Menü erneut. Bei Pause bleiben die Einstellungen verborgen, damit das laufende Match unverändert fortgesetzt wird.
+
+Spieler 1: Pfeiltasten links/rechts, oben zum Springen, Space zum Kicken, E für Adler und Z für Zug. Im KI-Modus funktioniert weiterhin S für Adler. Spieler 2 im Modus „Zu zweit“: A/D laufen, W springen, S oder F kicken, G für Adler und H für Zug. Beide spielen lokal an derselben Tastatur. KI-Steuerung, automatische Spezialschüsse und KI-Zielkorrekturen sind für Spieler 2 abgeschaltet.
