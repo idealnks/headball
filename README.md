@@ -66,4 +66,4 @@ Spieler 1: links/oben/rechts für die Ecke, Space zum Schießen. Als Torwart die
 
 ## Anpfiff-Countdown
 
-Vor jedem Anpfiff erscheint für drei Sekunden „3, 2, 1“: nach dem Start, nach Toren, vor der Verlängerung und zu Beginn jeder Turnierrunde. Ball, Figuren, Spielzeit, Wippfeld und Spezialladungen bleiben währenddessen stehen. Eingaben lösen in dieser Phase keine Aktionen aus. Pause hält auch den Countdown an; Fortsetzen setzt die verbleibende Vorbereitungszeit fort. Nach einem Tor läuft zuerst der kurze Torjubel, danach der neue Countdown.
+Vor jedem Anpfiff erscheint für drei Sekunden „3, 2, 1“: nach dem Start, vor der Verlängerung und zu Beginn jeder Turnierrunde. Ball, Figuren, Spielzeit, Wippfeld und Spezialladungen bleiben währenddessen stehen. Eingaben lösen in dieser Phase keine Aktionen aus. Pause hält auch den Countdown an; Fortsetzen setzt die verbleibende Vorbereitungszeit fort. Nach einem Tor geht es nach dem kurzen Torjubel direkt ohne Countdown weiter.
