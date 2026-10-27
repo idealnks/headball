@@ -2,12 +2,14 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
-function game(seed=42){
+function game(seed=42,skipCountdown=true){
  const math=Object.create(Math);math.random=()=>{seed=(1664525*seed+1013904223)>>>0;return seed/4294967296;};
  const handlers={};const elements=new Map();
  const element=()=>({textContent:'',innerHTML:'',hidden:false,focus(){},querySelector(){return element();},getContext(){return {};}});
  const context=vm.createContext({Math:math,Image:class {},document:{querySelector(s){if(!elements.has(s))elements.set(s,element());return elements.get(s);},querySelectorAll(){return [];}},window:{addEventListener(name,fn){handlers[name]=fn;}},requestAnimationFrame(){}});
  vm.runInContext(readFileSync(new URL('../public/game.js',import.meta.url),'utf8'),context);
+ // Existing physics tests enter live play directly; countdown tests use the real reset.
+ if(skipCountdown)vm.runInContext('const resetWithCountdown=resetField;resetField=()=>{resetWithCountdown();countdown=0;};',context);
  return {press:(code)=>handlers.keydown({key:code==='Space'?' ':code,code,repeat:false,preventDefault(){}}),release:code=>handlers.keyup({key:code,code}),run:s=>vm.runInContext(s,context),key:(repeat=false)=>handlers.keydown({key:' ',code:'Space',repeat,preventDefault(){}})};
 }
 test('Space lifts a nearby low ball forward without pausing',()=>{const g=game();g.run('begin();ball={x:350,y:432,vx:0,vy:0}');g.key();g.run('tick(1/120)');assert.equal(g.run('state'),'playing');assert.ok(g.run('ball.vx>400 && ball.vy < -600'));g.run('for(let n=0;n<35;n++)tick(1/120)');assert.ok(g.run('ball.y<320'));});
@@ -65,3 +67,9 @@ test('penalties end early when remaining first five kicks cannot change result',
 test('tied first five kicks continue in equal sudden death pairs',()=>{const g=game();g.run('begin();startPenalties();penalty.shots=[Array(5).fill(true),Array(5).fill(true)];penalty.totals=[5,5];penalty.turn=0;penalty.result=true;recordPenalty()');assert.equal(g.run('state'),'playing');assert.equal(g.run('penalty.turn'),1);g.run('penalty.result=false;recordPenalty()');assert.equal(g.run('state'),'ended');assert.equal(g.run('penalty.totals[0]'),6);});
 test('human penalty direction, keeper save and local controls work',()=>{const g=game();g.run('document.querySelector("#mode").value="local";begin();startPenalties()');g.press('ArrowLeft');g.press('KeyA');g.press('Space');assert.equal(g.run('penalty.result'),false);g.run('stepPenalty(.9);stepPenalty(1.4)');assert.equal(g.run('penalty.turn'),1);g.press('KeyD');g.press('ArrowLeft');g.press('KeyF');assert.equal(g.run('penalty.result'),true);});
 test('penalty mode disables specials, AI shoots automatically and pause freezes it',()=>{const g=game();g.run('begin();startPenalties();specialReady=[true,true];trainReady=[true,true]');assert.equal(g.run('activateSpecial(0)'),false);assert.equal(g.run('activateTrain(0)'),false);g.run('penalty.turn=1;tick(2.6)');assert.equal(g.run('penalty.phase'),'flight');g.run('pause();tick(2)');assert.equal(g.run('penalty.elapsed'),0);g.run('begin()');assert.equal(g.run('penalty'),null);});
+
+test('kickoff shows 3-2-1 and freezes players, ball, match clock and charge for three seconds',()=>{const g=game(42,false);g.run('begin()');assert.equal(g.run('countdown'),3);const initial=g.run('JSON.stringify([player.x,player.y,ai.x,ai.y,ball.x,ball.y,time,fieldTime,noGoalTime])');g.press('Space');g.press('ArrowRight');g.run('tick(1)');assert.equal(g.run('Math.ceil(countdown)'),2);g.run('tick(1)');assert.equal(g.run('Math.ceil(countdown)'),1);g.run('tick(1)');assert.equal(g.run('countdown'),0);assert.equal(g.run('JSON.stringify([player.x,player.y,ai.x,ai.y,ball.x,ball.y,time,fieldTime,noGoalTime])'),initial);g.run('tick(1/120)');assert.ok(g.run('time<120'));});
+test('goal celebration is followed by a fresh three second countdown',()=>{const g=game(42,false);g.run('begin();tick(3);goal(0);tick(1.6)');assert.equal(g.run('countdown'),3);assert.equal(g.run('scores[0]'),1);g.run('tick(2)');assert.equal(g.run('countdown'),1);assert.equal(g.run('time'),120);});
+test('overtime kickoff has a countdown without spending its 30 seconds',()=>{const g=game(42,false);g.run('begin();tick(3);scores=[1,1];time=.001;tick(1/120)');assert.equal(g.run('overtime'),true);assert.equal(g.run('countdown'),3);g.run('tick(3)');assert.equal(g.run('time'),30);});
+test('pause freezes countdown; resume continues; specials are blocked during countdown',()=>{const g=game(42,false);g.run('begin();tick(1);pause();tick(4)');assert.equal(g.run('countdown'),2);g.run('pause();specialReady=[true,true];trainReady=[true,true]');assert.equal(g.run('activateSpecial(0)'),false);assert.equal(g.run('activateTrain(1)'),false);g.run('tick(1)');assert.equal(g.run('countdown'),1);});
+test('next tournament round starts its own countdown',()=>{const g=game(42,false);g.run('document.querySelector("#mode").value="tournament";begin();tick(3);scores=[1,0];finishMatch();begin(true)');assert.equal(g.run('roundIndex'),1);assert.equal(g.run('countdown'),3);});

@@ -63,3 +63,7 @@ Im Startmenü zwischen Stadion (ebener Rasen), Acker (hügeliger Boden) und Wipp
 Bei Gleichstand nach der Verlängerung gibt es in allen Modi ein Elfmeterschießen in einer neutralen Frontansicht. Fünf Versuche pro Seite, mit vorzeitiger Entscheidung bei uneinholbarer Führung. Bei weiterem Gleichstand folgen gleich viele zusätzliche Versuche pro Seite, bis eine führt. Ergebnisse werden separat als „i. E.“ geführt; im Turnier kommt der Sieger weiter.
 
 Spieler 1: links/oben/rechts für die Ecke, Space zum Schießen. Als Torwart die Ecke mit denselben Tasten wählen. Spieler 2: A/W/D und F oder S. Gegen KI schießt diese nach kurzer Vorbereitungszeit automatisch. Bildschirmtasten sind ebenfalls verfügbar. Pause funktioniert weiterhin; Spezialfähigkeiten sind im Elfmeterschießen deaktiviert.
+
+## Anpfiff-Countdown
+
+Vor jedem Anpfiff erscheint für drei Sekunden „3, 2, 1“: nach dem Start, nach Toren, vor der Verlängerung und zu Beginn jeder Turnierrunde. Ball, Figuren, Spielzeit, Wippfeld und Spezialladungen bleiben währenddessen stehen. Eingaben lösen in dieser Phase keine Aktionen aus. Pause hält auch den Countdown an; Fortsetzen setzt die verbleibende Vorbereitungszeit fort. Nach einem Tor läuft zuerst der kurze Torjubel, danach der neue Countdown.
